@@ -1,0 +1,3 @@
+03 Jan 14:57:24.965 - [test.js] DEBUG: ====> betting...
+03 Jan 14:57:24.966 - [test.js] DEBUG: email: teste+2017-1-3@paulovelho.com
+03 Jan 14:57:24.966 - [test.js] DEBUG: list: Bette Davis, Bill Murray, Christian Bale, Al Pacino, Mary Pickford, Humphrey Bogart, Donald Sutherland, Cary Grant, Hattie McDaniel, Julie Andrews, Winona Ryder, Audrey Hepburn, Robert Downey Jr., Denzel Washington, Kate Winslet

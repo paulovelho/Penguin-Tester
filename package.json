@@ -1,0 +1,19 @@
+{
+  "name": "Brejas",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "async": "2.0.x",
+    "cheerio": "0.22.x",
+    "color-logs": "git://github.com/paulovelho/Color-Logs.git",
+    "html": "*",
+    "jsdom": "*",
+    "jquery": "*",
+    "node-horseman": "3.2.0",
+    "request": "*",
+    "q": "1.4.1"
+  }
+}

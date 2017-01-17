@@ -12,11 +12,11 @@ var horseman = new Horseman({
 
 var log = require("color-logs")(true, true, __filename);
 var util = require("util");
+var api = require("./pncApi.js");
 
 function PeNaCova(){
 
-  var environment = "http://dev.bolaopenacova.com";
-//  var environment = "http://www.bolaopenacova.com";
+  var environment = "http://www.bolaopenacova.com";
   var list = [];
   var email;
 
@@ -126,6 +126,18 @@ function PeNaCova(){
         log.colors("white").info("Testing if all names are present in page: " + assertList(table) );
         done();
       })
+      .catch(
+        (error) => {
+          log.error("horseman error!");
+          log.debug("cleaning our mess...");
+          checkEmail( () => {
+            cleanListas( () => {
+              log.debug("mess clean (I guess)");
+              logError("horseman error stopped execution...", error);
+            });
+          });
+        }
+      )
       .close();
   }
 
@@ -138,6 +150,7 @@ function PeNaCova(){
         if( resp.email_to != email ) {
           logError("E-mail validation error", resp);
         } else {
+          contactServer.avoidSending(resp.id);
           log.colors("white").info("Testing if all names are present in e-mail: " + assertList(resp.message) );
         }
       })
@@ -151,13 +164,31 @@ function PeNaCova(){
 
   checkApi = function(done) {
     log.colors("yellow", "black").debug("====> checking API");
-    var api = require("./pncApi.js");
     var emails = api.getEmailTests()
       .then((resp) => {
         if( resp.length == 0 ) {
           logError("no data existing in bolaopenacova.com!");
         } else {
-          console.info(resp);
+          var lista = resp[0];
+          if (lista.email != email) {
+            logError("incorrect email on bolaopenacova.com", data);
+          } else {
+            cleanListas(done);
+          }
+        }
+      })
+      .catch( (data) => {
+        logError("Error in API", data);
+      });
+  }
+
+  cleanListas = function(done) {
+    var emails = api.cleanEmailTests()
+      .then((resp) => {
+        if( resp.count == 0 ) {
+          logError("no data existing in bolaopenacova.com!");
+        } else {
+          log.debug("e-mails cleaned...");
         }
       })
       .catch( (data) => {
@@ -167,7 +198,6 @@ function PeNaCova(){
         done();
       });
   }
-
 
   return {
     Load: Load,

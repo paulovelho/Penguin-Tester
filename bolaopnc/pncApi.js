@@ -30,7 +30,7 @@ function pncApi(){
   cleanEmailTests = function() {
     var queue = q.defer();
     let apiUrl = config.penacova.api_url + "admin-cleanTests.php";
-    log.colors("red", "black").debug("checking API for tests e-mails");
+    log.colors("red", "black").debug("cleaning test emails");
     request.post({
       url: apiUrl,
       form: {
@@ -47,7 +47,8 @@ function pncApi(){
   }
 
   return {
-    getEmailTests: getEmailTests
+    getEmailTests: getEmailTests,
+    cleanEmailTests: cleanEmailTests
   }
 }
 

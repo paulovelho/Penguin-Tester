@@ -15,6 +15,8 @@ var util = require("util");
 
 function PeNaCova(){
 
+  var environment = "http://dev.bolaopenacova.com";
+//  var environment = "http://www.bolaopenacova.com";
   var list = [];
   var email;
 
@@ -29,9 +31,12 @@ function PeNaCova(){
 
   function Run() {
     log.colors("white", "black").info("=====[ testing: pe na cova ]=====");
+    log.colors("white", "blue").info("=====[ environment: " + environment + " ]=====");
     var queue = q.defer();
     async.series([
-      checkEmail
+      bet, 
+      checkEmail,
+      checkApi
     ], () => {
       log.debug("PeNaCova run finished");
       queue.resolve();
@@ -47,7 +52,7 @@ function PeNaCova(){
     process.exit(1);
   }
 
-  GenerateList = function() {
+  function GenerateList() {
     var queue = q.defer();
     fs.readFile("./bolaopnc/apostas.txt", "utf-8", function(err, data){
       if(err) throw err;
@@ -58,7 +63,7 @@ function PeNaCova(){
     });
     return queue.promise;
   }
-  GenerateEmail = function() {
+  function GenerateEmail() {
     getNowDate = function() {
       var date = new Date();
       return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
@@ -78,19 +83,17 @@ function PeNaCova(){
   }
 
 
-  function Bet(done) {
-    logError("Penguin disabled"); return;
-
+  bet = function(done) {
     log.colors("yellow", "black").debug("====> betting...");
     log.colors("yellow", "black").debug("email:", email);
     log.colors("yellow", "black").debug("list:", list.join(", "));
 
     horseman
-      .authentication("paulovelho", "jackass1")
       .on('urlChanged', function(targetUrl) {
         log.colors("red", "black").debug("horseman loaded: " + targetUrl);
       })
-      .open("http://www.bolaopenacova.com")
+      .authentication("paulovelho", "jackass1")
+      .open(environment)
       .click("a:contains('Envie sua lista!')")
       .waitForNextPage()
       .type('input[name="data_nome"]', 'PNC')
@@ -126,11 +129,11 @@ function PeNaCova(){
       .close();
   }
 
-  function checkEmail(done){
+  checkEmail = function(done){
     log.colors("yellow", "black").debug("====> checking e-mail");
     log.colors("yellow", "black").debug("email:", email);
     var contactServer = require("./contactServer.js");
-    return contactServer.getEmail("paulovelho@paulovelho.com")
+    return contactServer.getEmail(email)
       .then((resp) => {
         if( resp.email_to != email ) {
           logError("E-mail validation error", resp);
@@ -145,6 +148,26 @@ function PeNaCova(){
         done();
       });
   }
+
+  checkApi = function(done) {
+    log.colors("yellow", "black").debug("====> checking API");
+    var api = require("./pncApi.js");
+    var emails = api.getEmailTests()
+      .then((resp) => {
+        if( resp.length == 0 ) {
+          logError("no data existing in bolaopenacova.com!");
+        } else {
+          console.info(resp);
+        }
+      })
+      .catch( (data) => {
+        logError("Error in API", data);
+      }).finally( () => {
+        log.debug("Data ok at bolaopenacova.com");
+        done();
+      });
+  }
+
 
   return {
     Load: Load,

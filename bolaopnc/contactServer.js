@@ -9,7 +9,9 @@ function pncContactServer(){
   getEmail = function(email) {
     var queue = q.defer();
     let key = config.penacova.contact_key;
-    let apiUrl = config.penacova.contact_url + "&auth=" + key + "&email=" + email;
+    let encodedMail = encodeURIComponent(email);
+    let apiUrl = config.penacova.contact_url + "&auth=" + key + "&email=" + encodedMail;
+    log.debug("contact url: " + apiUrl);
     request(apiUrl, function (error, response, body) {
       if (!error && response.statusCode == 200) {
         queue.resolve(JSON.parse(body));
